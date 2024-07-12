@@ -2,16 +2,19 @@
 
 #define MAX_X 100
 #define MAX_Y 40
+#define TICK 300
+
+//#define DEBUG
 
 enum colors {
     color_player0,
     color_player1,
     color_player2,
     color_player3,
+    color_player_singleplayer,
     color_wall,
     color_food,
-    color_empty,
-    color_player_singleplayer
+    color_empty
 };
 
 enum directions {
@@ -32,6 +35,12 @@ typedef struct{
     unsigned length;
     point* snake; 
 }player;
+
+
+int quit = 0;
+int is_game_over = 0;
+player snk[4];
+int score[4] = {0, 0, 0, 0};
 
 int init_colors(){
     if (has_colors() == FALSE) {
@@ -83,14 +92,88 @@ int init_player(player* snk, int num){
     snk->snake[0].x = rand() % MAX_X;
     snk->snake[0].y = rand() % MAX_Y;
 
-    int to_choose_dir = 1;
-    while(to_choose_dir){
+    while(1){
         snk->dir = rand() % 4;
-        if(snk->dir = up || snk->snake[0].y > 2){ to_choose_dir--; }
-        if(snk->dir = down || snk->snake[0].y < MAX_Y - 2){ to_choose_dir--; }
-        if(snk->dir = right || snk->snake[0].x < MAX_X - 2){ to_choose_dir--; }
-        if(snk->dir = left || snk->snake[0].x > 2){ to_choose_dir--; }
+        if(snk->dir = up || snk->snake[0].y > 2){ break; }
+        if(snk->dir = down || snk->snake[0].y < MAX_Y - 2){ break; }
+        if(snk->dir = right || snk->snake[0].x < MAX_X - 2){ break; }
+        if(snk->dir = left || snk->snake[0].x > 2){ break; }
     }
+    
+    #ifdef DEBUG
+    FILE* logfile = fopen("../debug/errors.log", "a+");
+    time_t mytime = time(0);
+    struct tm* now = localtime(&mytime);
+    fprintf(logfile, "\n%d.%d.%d %d:%d:%d\nNum:%d, head: x %d, y %d, dir: %d\n", now->tm_mday, now->tm_mon, now->tm_year + 1900, now->tm_hour, now->tm_min, now->tm_sec, snk->number, snk->snake[0].x, snk->snake[0].y, snk->dir);
+    fclose(logfile);
+    #endif
+}
+
+void draw_snake(player snk){
+    //Draw head
+    switch(snk.dir){
+        case up:
+            attron(COLOR_PAIR(snk.number));
+            mvaddch(snk.snake[0].y - 1, snk.snake[0].x, ' ');
+            attroff(COLOR_PAIR(snk.number));
+        break;
+
+        case down:
+            attron(COLOR_PAIR(snk.number));
+            mvaddch(snk.snake[0].y + 1, snk.snake[0].x, ' ');
+            attroff(COLOR_PAIR(snk.number));
+        break;
+        
+        case right:
+            attron(COLOR_PAIR(snk.number));
+            mvaddch(snk.snake[0].y, snk.snake[0].x + 1, ' ');
+            attroff(COLOR_PAIR(snk.number));
+        break;
+
+        case left:
+            attron(COLOR_PAIR(snk.number));
+            mvaddch(snk.snake[0].y, snk.snake[0].x - 1, ' ');
+            attroff(COLOR_PAIR(snk.number));
+        break;
+    }
+    //Draw empty at the end of the tail
+    attron(COLOR_PAIR(color_empty));
+    mvaddch(snk.snake[snk.length - 1].y, snk.snake[snk.length - 1].x, ' ');
+    attroff(COLOR_PAIR(color_empty));
+}
+
+void move_snake(player snk){
+    for(int i = snk.length - 1; i > 0; i--){
+        snk.snake[i].x = snk.snake[i - 1].x;
+        snk.snake[i].y = snk.snake[i - 1].y;
+    }
+    if(snk.dir == up){ snk.snake[0].y--; }
+    if(snk.dir == down){ snk.snake[0].y++; }
+    if(snk.dir == right){ snk.snake[0].x++; }
+    if(snk.dir == left){ snk.snake[0].x--; }
+
+    if(snk.snake[0].x == 0 || snk.snake[0].x == MAX_X || snk.snake[0].y == 0 || snk.snake[0].y == MAX_Y){
+        quit++;
+        is_game_over++;
+    }
+}
+
+void game_over(){
+    wclear(stdscr);
+    mvprintw(MAX_Y/2, MAX_X/2, "Game OVER");
+    mvprintw(MAX_Y/2 + 1, MAX_X/2, "YOUR SCORE: ");
+    refresh();
+    getch();
+}
+
+void game(){
+    while(!quit){
+        draw_snake(snk[0]);
+        move_snake(snk[0]);
+        refresh();
+        usleep(TICK*1000);
+    }
+    if(is_game_over){ game_over(); }
 }
 
 int play_singleplayer(){
@@ -98,7 +181,8 @@ int play_singleplayer(){
     curs_set(0);
     noecho();
     init_map(MAX_X, MAX_Y);
-    getch();
+    init_player(&snk[0], 4);
+    game();
     endwin();
     return 1;
 }
