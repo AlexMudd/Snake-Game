@@ -1,5 +1,8 @@
 #include "../headers/main.h"
 
+#define MAX_X 100
+#define MAX_Y 40
+
 enum colors {
     color_player0,
     color_player1,
@@ -10,6 +13,25 @@ enum colors {
     color_empty,
     color_player_singleplayer
 };
+
+enum directions {
+    up,
+    right,
+    down,
+    left
+};
+
+typedef struct{
+    int x;
+    int y;
+}point;
+
+typedef struct{
+    int number;
+    enum directions dir;
+    unsigned length;
+    point* snake; 
+}player;
 
 int init_colors(){
     if (has_colors() == FALSE) {
@@ -52,11 +74,30 @@ int init_map(int max_x, int max_y){
     refresh();
 }
 
+int init_player(player* snk, int num){
+    srand(time(0));
+    snk->number = num;
+    snk->length = 1;
+
+    snk->snake = malloc(1*sizeof(point));
+    snk->snake[0].x = rand() % MAX_X;
+    snk->snake[0].y = rand() % MAX_Y;
+
+    int to_choose_dir = 1;
+    while(to_choose_dir){
+        snk->dir = rand() % 4;
+        if(snk->dir = up || snk->snake[0].y > 2){ to_choose_dir--; }
+        if(snk->dir = down || snk->snake[0].y < MAX_Y - 2){ to_choose_dir--; }
+        if(snk->dir = right || snk->snake[0].x < MAX_X - 2){ to_choose_dir--; }
+        if(snk->dir = left || snk->snake[0].x > 2){ to_choose_dir--; }
+    }
+}
+
 int play_singleplayer(){
     initscr();
     curs_set(0);
     noecho();
-    init_map(100, 40);
+    init_map(MAX_X, MAX_Y);
     getch();
     endwin();
     return 1;
