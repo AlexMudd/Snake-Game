@@ -1,36 +1,8 @@
 #include "../headers/main.h"
-
-#define MAX_X 50
-#define MAX_Y 40
-#define TICK 100
-
-#define DEBUG
-
-enum colors {
-    color_player_singleplayer = 1,
-    color_wall,
-    color_food,
-    color_empty
-};
-
-enum directions {
-    up,
-    right,
-    down,
-    left
-};
-
-typedef struct{
-    int x;
-    int y;
-}point;
-
-typedef struct{
-    enum directions dir;
-    unsigned length;
-    int new_tail;
-    point* snake;
-}player;
+#include "../headers/global_structs.h"
+#include "../headers/inits.h"
+#include "../headers/debug.h"
+#include "../headers/thread_funcs.h"
 
 int quit = 0;
 int is_game_over = 0;
@@ -39,74 +11,6 @@ int score = 0;
 int need_food = 1;
 point food;
 
-void log_info(char* Text){
-    FILE* logfile = fopen("debug/logs.log", "a+");
-    fprintf(logfile, "%s\n", Text);
-    fclose(logfile);
-}
-
-int init_colors(){
-    if (has_colors() == FALSE) {
-        endwin();
-        printf("Your terminal does not support color");
-
-        #ifdef DEBUG
-            log_info("[-]The terminal does not support color");
-        #endif
-
-        return 0;
-    }
-
-    #ifdef DEBUG
-        log_info("_____________________________________");
-        log_info("[+]Colors Initiated 1/3");
-    #endif
-
-    start_color();
-    init_pair(color_player_singleplayer, COLOR_GREEN, COLOR_GREEN);
-    init_pair(color_wall, COLOR_WHITE, COLOR_WHITE);
-    init_pair(color_food, COLOR_WHITE, COLOR_BLACK);
-    init_pair(color_empty, COLOR_BLACK, COLOR_BLACK);
-    clear();
-
-    return 1;
-}
-
-int init_map(int max_x, int max_y){
-    for(int i = 0; i <= max_x; i++){
-        for(int j = 0; j <= max_y; j++){
-            if(i == 0 || j == 0 || i == max_x || j == max_y){
-                attron(COLOR_PAIR(color_wall));
-                mvaddch(j, i, ' ');
-                attroff(COLOR_PAIR(color_wall));
-            }
-        }
-    }
-    refresh();
-
-    #ifdef DEBUG
-        log_info("[+]Map Initiated 2/3");
-    #endif
-
-    return 1;
-}
-
-int init_player(player* snk){
-    srand(time(0));
-    snk->length = 1;
-    snk->new_tail = 0;
-
-    snk->snake = malloc(1*sizeof(point));
-    snk->snake[0].x = 5 + rand() % (MAX_X - 5);
-    snk->snake[0].y = 5 + rand() % (MAX_Y - 5);
-
-    snk->dir = rand() % 4;
-    
-    #ifdef DEBUG
-        log_info("[+]Player Initiated 3/3");
-    #endif
-    return 1;
-}
 
 void draw_food(){
     attron(COLOR_PAIR(color_food));
@@ -167,17 +71,6 @@ void draw_snake(){
 
 }
 
-void* generate_food(void*){
-    while(1){
-        if(need_food){
-            srand(time(0));
-            food.x = 2 + rand() % (MAX_X - 3);
-            food.y = 2 + rand() % (MAX_Y - 3);
-            need_food = 0;
-        }
-    }
-}
-
 void move_snake(){
     for(int i = snk.length - 1; i > 0; i--){
         snk.snake[i].x = snk.snake[i - 1].x;
@@ -218,29 +111,6 @@ void game_over(){
     mvprintw(MAX_Y/2 + 2, MAX_X/2, "PRESS ANY KEY...");
     refresh();
     getch();
-}
-
-void* get_key(void*){
-    while(1){
-        int k = getch();
-        switch(k){
-            case 'w':
-                if(snk.dir != down) { snk.dir = up; }
-                break;
-            case 's':
-                if(snk.dir != up) { snk.dir = down; }
-                break;
-            case 'd':
-                if(snk.dir != left) { snk.dir = right; }
-                break;
-            case 'a':
-                if(snk.dir != right) { snk.dir = left; }
-                break;
-            case 'q':
-                quit++;
-                break;              
-        }
-    }
 }
 
 void game(){
