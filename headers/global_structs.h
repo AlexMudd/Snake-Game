@@ -1,10 +1,6 @@
 #ifndef __GLOBALSTRUCTS_H__
 #define __GLOBALSTRUCTS_H__
 
-#define MAX_X 50
-#define MAX_Y 40
-#define TICK 100
-
 enum colors {
     color_player_singleplayer = 1,
     color_wall,

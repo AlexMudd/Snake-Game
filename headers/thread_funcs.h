@@ -11,6 +11,10 @@ extern point food;
 extern player snk;
 extern int quit;
 
+extern int MAX_X;
+extern int MAX_Y;
+extern int TICK;
+
 void* generate_food(void*);
 void* get_key(void*);
 
