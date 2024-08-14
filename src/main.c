@@ -1,10 +1,10 @@
 #include "../headers/main.h"
 
-#define MAX_X 150
+#define MAX_X 50
 #define MAX_Y 40
 #define TICK 100
 
-//#define DEBUG
+#define DEBUG
 
 enum colors {
     color_player_singleplayer = 1,
@@ -32,7 +32,6 @@ typedef struct{
     point* snake;
 }player;
 
-
 int quit = 0;
 int is_game_over = 0;
 player snk;
@@ -40,31 +39,40 @@ int score = 0;
 int need_food = 1;
 point food;
 
+void log_info(char* Text){
+    FILE* logfile = fopen("debug/logs.log", "a+");
+    fprintf(logfile, "%s\n", Text);
+    fclose(logfile);
+}
+
 int init_colors(){
     if (has_colors() == FALSE) {
         endwin();
-        printf("Your terminal does not support color\n");
+        printf("Your terminal does not support color");
+
+        #ifdef DEBUG
+            log_info("[-]The terminal does not support color");
+        #endif
+
         return 0;
     }
+
+    #ifdef DEBUG
+        log_info("_____________________________________");
+        log_info("[+]Colors Initiated 1/3");
+    #endif
+
     start_color();
     init_pair(color_player_singleplayer, COLOR_GREEN, COLOR_GREEN);
     init_pair(color_wall, COLOR_WHITE, COLOR_WHITE);
     init_pair(color_food, COLOR_WHITE, COLOR_BLACK);
     init_pair(color_empty, COLOR_BLACK, COLOR_BLACK);
     clear();
+
     return 1;
 }
 
-void log_err(char* Error){
-    FILE* logfile = fopen("../debug/errors.log", "a+");
-    time_t mytime = time(0);
-    struct tm* now = localtime(&mytime);
-    fprintf(logfile, "\n%d.%d.%d %d:%d:%d\n%s\n", now->tm_mday, now->tm_mon, now->tm_year + 1900, now->tm_hour, now->tm_min, now->tm_sec, Error);
-    fclose(logfile);
-}
-
 int init_map(int max_x, int max_y){
-    if(!init_colors()){ log_err("Can't init colors"); return 0; }
     for(int i = 0; i <= max_x; i++){
         for(int j = 0; j <= max_y; j++){
             if(i == 0 || j == 0 || i == max_x || j == max_y){
@@ -75,6 +83,12 @@ int init_map(int max_x, int max_y){
         }
     }
     refresh();
+
+    #ifdef DEBUG
+        log_info("[+]Map Initiated 2/3");
+    #endif
+
+    return 1;
 }
 
 int init_player(player* snk){
@@ -89,12 +103,9 @@ int init_player(player* snk){
     snk->dir = rand() % 4;
     
     #ifdef DEBUG
-    FILE* logfile = fopen("../debug/errors.log", "a+");
-    time_t mytime = time(0);
-    struct tm* now = localtime(&mytime);
-    fprintf(logfile, "\n%d.%d.%d %d:%d:%d\nHead: x %d, y %d, dir: %d\n", now->tm_mday, now->tm_mon, now->tm_year + 1900, now->tm_hour, now->tm_min, now->tm_sec, snk->snake[0].x, snk->snake[0].y, snk->dir);
-    fclose(logfile);
+        log_info("[+]Player Initiated 3/3");
     #endif
+    return 1;
 }
 
 void draw_food(){
@@ -249,6 +260,7 @@ int play(){
     initscr();
     curs_set(0);
     noecho();
+    init_colors();
     init_map(MAX_X, MAX_Y);
     init_player(&snk);
 
