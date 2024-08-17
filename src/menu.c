@@ -36,6 +36,10 @@ int menu(){
 
     refresh();
 
+    TICK = EASY_DIFFICULT;
+    MAX_X = menu_max_x * SMALL_MAP / 100;
+    MAX_Y = menu_max_y * SMALL_MAP / 100;
+
     while(!ready_to_play && !exit){
         if(select == PLAY){
 
@@ -103,4 +107,8 @@ int menu(){
         }
     }
     return exit ? 0 : 1;
+}
+
+void settings(){
+
 }

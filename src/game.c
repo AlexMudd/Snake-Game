@@ -56,7 +56,8 @@ void draw_snake(){
     for(int i = 0; i < getmaxx(stdscr); i++){
         mvaddch(MAX_Y + 5, i, ' ');
     }
-    mvprintw(MAX_Y + 5, 0, "Your score: %d", score);
+    mvprintw(MAX_Y + 4, 0, "Press 'q' to quit in menu");
+    mvprintw(MAX_Y + 2, 0, "Your score: %d", score);
 
 }
 
