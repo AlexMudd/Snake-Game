@@ -11,7 +11,7 @@ int quit = 0;
 int is_game_over = 0;
 player snk;
 int score = 0;
-int need_food = 1;
+int need_food = 0;
 point food;
 
 #endif

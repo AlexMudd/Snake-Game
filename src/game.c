@@ -102,6 +102,8 @@ void game_over(){
 }
 
 void game(){
+    need_food = 1;
+    usleep(10000);
     while(!quit){
         draw_food();
         draw_snake();
