@@ -9,6 +9,7 @@ void draw_food(){
     attron(COLOR_PAIR(color_food));
     attron(A_BOLD);
     mvaddch(food.y, food.x, '*');
+    attroff(A_BOLD);
     attroff(COLOR_PAIR(color_food));
 }
 
@@ -92,6 +93,8 @@ void move_snake(){
 }
 
 void game_over(){
+    need_food = 0;
+    free(snk.snake);
     usleep(3000000);
     wclear(stdscr);
     mvprintw(MAX_Y/2, MAX_X/2, "Game OVER");
@@ -102,6 +105,9 @@ void game_over(){
 }
 
 void game(){
+    quit = 0;
+    is_game_over = 0;
+    score = 0;
     need_food = 1;
     usleep(10000);
     while(!quit){
@@ -116,11 +122,8 @@ void game(){
 
 int play(){
     pthread_t key_pid, food_pid;
+    clear();
 
-    initscr();
-    curs_set(0);
-    noecho();
-    init_colors();
     init_map(MAX_X, MAX_Y);
     init_player(&snk);
 
@@ -129,8 +132,12 @@ int play(){
 
     game();
 
+    pthread_cancel(key_pid);
+    pthread_cancel(food_pid);
+
     pthread_detach(key_pid);
     pthread_detach(food_pid);
+    
     endwin();
     return 1;
 }

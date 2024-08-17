@@ -22,6 +22,7 @@ int init_colors(){
     init_pair(color_wall, COLOR_WHITE, COLOR_WHITE);
     init_pair(color_food, COLOR_WHITE, COLOR_BLACK);
     init_pair(color_empty, COLOR_BLACK, COLOR_BLACK);
+    init_pair(color_selected, COLOR_GREEN, COLOR_BLACK);
     clear();
 
     return 1;

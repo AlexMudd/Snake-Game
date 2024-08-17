@@ -4,8 +4,14 @@
 #include "../headers/debug.h"
 #include "../headers/thread_funcs.h"
 #include "../headers/game.h"
+#include "../headers/menu.h"
 
 int main(){
-    play();
-    return 0;
+    while(1){
+        if(!menu()){
+            endwin();
+            return 0;
+        }
+        play();
+    }
 }

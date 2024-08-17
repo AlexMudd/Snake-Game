@@ -5,7 +5,8 @@ enum colors {
     color_player_singleplayer = 1,
     color_wall,
     color_food,
-    color_empty
+    color_empty,
+    color_selected
 };
 
 enum directions {
