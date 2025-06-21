@@ -36,9 +36,9 @@ int menu(){
 
     refresh();
 
-    TICK = EASY_DIFFICULT;
-    MAX_X = menu_max_x * SMALL_MAP / 100;
-    MAX_Y = menu_max_y * SMALL_MAP / 100;
+    TICK = MEDIUM_DIFFICULT;
+    MAX_X = menu_max_x * MEDIUM_MAP / 100;
+    MAX_Y = menu_max_y * MEDIUM_MAP / 100;
 
     while(!ready_to_play && !exit){
         if(select == PLAY){
